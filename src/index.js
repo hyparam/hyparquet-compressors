@@ -6,7 +6,7 @@ import pako from 'pako'
  */
 export const compressors = {
   SNAPPY: snappyUncompressor(),
-  GZIP: pako.ungzip,
+  GZIP: (/** @type {Uint8Array} */ input) => pako.ungzip(input),
   BROTLI: () => new Uint8Array(), // TODO
   ZSTD: () => new Uint8Array(), // TODO
 }
