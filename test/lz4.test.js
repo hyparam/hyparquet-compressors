@@ -3,14 +3,14 @@ import { parquetRead, toJson } from 'hyparquet'
 import { describe, expect, it } from 'vitest'
 import { compressors } from '../src/index.js'
 
-describe('gzip compressor', () => {
-  it('should read gzip compressed parquet file', async () => {
-    const buffer = fs.readFileSync('test/files/concatenated_gzip_members.parquet')
+describe('lz4 compressor', () => {
+  it('should read lz4 compressed parquet file', async () => {
+    const buffer = fs.readFileSync('test/files/non_hadoop_lz4_compressed.parquet')
     const file = new Uint8Array(buffer).buffer
-    const expected = fs.readFileSync('test/files/concatenated_gzip_members.json').toString()
+    const expected = fs.readFileSync('test/files/non_hadoop_lz4_compressed.json').toString()
 
     await parquetRead({ file, compressors, onComplete: data => {
-      expect(data.length).toBe(513)
+      expect(data.length).toBe(4)
       expect(toJson(data)).toEqual(JSON.parse(expected))
     } })
   })
