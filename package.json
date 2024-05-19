@@ -18,15 +18,19 @@
   "type": "module",
   "types": "src/index.d.ts",
   "scripts": {
+    "build": "rollup -c",
     "coverage": "vitest run --coverage",
     "lint": "eslint .",
     "test": "vitest run"
   },
   "dependencies": {
-    "hysnappy": "0.3.1"
+    "hysnappy": "0.3.1",
+    "pako": "2.1.0"
   },
   "devDependencies": {
     "@babel/eslint-parser": "7.24.5",
+    "@rollup/plugin-node-resolve": "15.2.3",
+    "@rollup/plugin-terser": "0.4.4",
     "@types/node": "20.12.12",
     "@types/pako": "2.0.3",
     "@vitest/coverage-v8": "1.6.0",
@@ -34,7 +38,7 @@
     "eslint-plugin-import": "2.29.1",
     "eslint-plugin-jsdoc": "48.2.5",
     "hyparquet": "0.9.3",
-    "pako": "2.1.0",
+    "rollup": "4.17.2",
     "typescript": "5.4.5",
     "vitest": "1.6.0"
   }

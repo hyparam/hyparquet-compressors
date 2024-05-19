@@ -7,6 +7,9 @@
     "extends": [
       "eslint:recommended"
     ],
+    "ignorePatterns": [
+      "dist/"
+    ],
     "parserOptions": {
       "ecmaVersion": 13,
       "sourceType": "module"
@@ -40,6 +43,7 @@
       "jsdoc/require-returns-type": "error",
       "jsdoc/sort-tags": "error",
       "no-constant-condition": "off",
+      "no-extra-parens": "error",
       "no-multi-spaces": "error",
       "no-trailing-spaces": "error",
       "no-var": "error",
