@@ -10,6 +10,10 @@ export function LZ4(input, outputLength) {
   let len = 0 // output position
   for (let i = 0; i < input.length;) {
     const token = input[i++]
+    if (!token) {
+      i += 7 // leading length
+      continue
+    }
 
     let literals = token >> 4
     if (literals) {
@@ -24,7 +28,7 @@ export function LZ4(input, outputLength) {
     }
 
     const offset = input[i++] | input[i++] << 8
-    if (!offset || offset > len) throw new Error('lz4 offset out of range')
+    if (!offset || offset > len) throw new Error(`lz4 offset out of range ${offset}`)
     // match length
     let matchLength = (token & 0xf) + 4
     let byte = matchLength + 240
