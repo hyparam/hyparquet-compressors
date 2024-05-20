@@ -25,14 +25,12 @@
   },
   "dependencies": {
     "hysnappy": "0.3.1",
-    "lz4": "0.6.5",
     "pako": "2.1.0"
   },
   "devDependencies": {
     "@babel/eslint-parser": "7.24.5",
     "@rollup/plugin-node-resolve": "15.2.3",
     "@rollup/plugin-terser": "0.4.4",
-    "@types/lz4": "0.6.4",
     "@types/node": "20.12.12",
     "@types/pako": "2.0.3",
     "@vitest/coverage-v8": "1.6.0",
