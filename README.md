@@ -11,6 +11,8 @@ This package exports a `compressors` object intended to be passed into [hyparque
 
 The hyparquet library by default only supports `uncompressed` and `snappy` compressed files. The `hyparquet-compressors` package extends support for all legal parquet compression formats.
 
+The `hyparquet-compressors` package works in both node.js and the browser. Uses js and wasm packages, no system dependencies.
+
 ## Usage
 
 ```js
@@ -19,6 +21,8 @@ import { compressors } from 'hyparquet-compressors'
 
 await parquetRead({ file, compressors, onComplete: console.log })
 ```
+
+See [hyparquet](https://github.com/hyparam/hyparquet) repo for further info.
 
 # Supported compression formats
 
@@ -35,6 +39,12 @@ Parquet compression types supported with `hyparquet-compressors`:
 # References
 
  - https://parquet.apache.org/docs/file-format/data-pages/compression/
+ - https://en.wikipedia.org/wiki/Brotli
  - https://en.wikipedia.org/wiki/Gzip
  - https://en.wikipedia.org/wiki/LZ4_(compression_algorithm)
  - https://en.wikipedia.org/wiki/Snappy_(compression)
+ - https://en.wikipedia.org/wiki/Zstd
+ - https://github.com/101arrowz/fzstd
+ - https://github.com/foliojs/brotli.js
+ - https://github.com/hyparam/hysnappy
+ - https://github.com/nodeca/pako
