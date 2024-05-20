@@ -11,4 +11,5 @@ export const compressors = {
   BROTLI: () => new Uint8Array(), // TODO
   ZSTD: () => new Uint8Array(), // TODO
   LZ4,
+  LZ4_RAW: LZ4,
 }

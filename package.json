@@ -6,6 +6,8 @@
     "decompress",
     "decompression",
     "decompressor",
+    "gzip",
+    "lz4",
     "hyparquet",
     "parquet"
   ],
