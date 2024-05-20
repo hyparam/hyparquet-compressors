@@ -52,7 +52,7 @@
       "no-var": "error",
       "object-curly-spacing": ["error", "always"],
       "prefer-const": "error",
-      "prefer-destructuring": ["warn", {"object": true, "array": false}],
+      "prefer-destructuring": ["warn", { "VariableDeclarator": { "object": true, "array": false }} ],
       "prefer-promise-reject-errors": "error",
       "quotes": ["error", "single"],
       "require-await": "warn",

@@ -1,6 +1,6 @@
-import BROTLI from 'brotli/decompress.js'
 import { decompress as ZSTD } from 'fzstd'
 import { snappyUncompressor } from 'hysnappy'
+import { BROTLI } from './brotli.js'
 import { gunzip } from './gzip.js'
 import { LZ4, LZ4_RAW } from './lz4.js'
 
@@ -14,7 +14,6 @@ export const compressors = {
     gunzip(input, out)
     return out
   },
-  // @ts-expect-error brotli expects Buffer but Uint8Array works
   BROTLI,
   ZSTD: input => ZSTD(input),
   LZ4,

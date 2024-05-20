@@ -13,3 +13,7 @@ export type Compressors = {
 }
 
 export const compressors: Compressors
+
+declare module 'brotli/decompress' {
+  export default function(input: Buffer, outputLength: number): Buffer
+}
