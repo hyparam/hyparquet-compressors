@@ -1,6 +1,6 @@
 {
   "name": "hyparquet-compressors",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Decompressors for hyparquet",
   "keywords": [
     "brotli",
@@ -10,7 +10,8 @@
     "gzip",
     "lz4",
     "hyparquet",
-    "parquet"
+    "parquet",
+    "zstd"
   ],
   "license": "MIT",
   "repository": {
