@@ -1,3 +1,4 @@
+import commonjs from '@rollup/plugin-commonjs'
 import resolve from '@rollup/plugin-node-resolve'
 import terser from '@rollup/plugin-terser'
 
@@ -10,6 +11,7 @@ export default {
   },
   plugins: [
     resolve(), // resolve node dependencies
+    commonjs(), // convert commonjs to es6
     terser(), // minify
   ],
 }
