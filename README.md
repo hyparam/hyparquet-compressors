@@ -1,5 +1,9 @@
 # hyparquet decompressors
 
+[![workflow status](https://github.com/hyparam/hyparquet-compressors/actions/workflows/ci.yml/badge.svg)](https://github.com/hyparam/hyparquet-compressors/actions)
+[![mit license](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+![coverage](https://img.shields.io/badge/Coverage-97-darkred)
+
 This package exports a `compressors` object intended to be passed into [hyparquet](https://github.com/hyparam/hyparquet).
 
 [Apache Parquet](https://parquet.apache.org) is a popular columnar storage format that is widely used in data engineering, data science, and machine learning applications for efficiently storing and processing large datasets. It supports a number of different compression formats, but most parquet files use snappy compression.
