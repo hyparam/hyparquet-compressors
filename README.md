@@ -26,9 +26,9 @@ Parquet compression types supported with `hyparquet-compressors`:
  - [X] Snappy
  - [x] GZip
  - [ ] LZO
- - [ ] Brotli
+ - [X] Brotli
  - [X] LZ4
- - [ ] ZSTD
+ - [X] ZSTD
  - [X] LZ4_RAW
 
 # References

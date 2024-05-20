@@ -1,5 +1,6 @@
 // @ts-ignore
 import BROTLI from 'brotli/decompress'
+import { decompress as ZSTD } from 'fzstd'
 import { snappyUncompressor } from 'hysnappy'
 import pako from 'pako'
 import { LZ4, LZ4_RAW } from './lz4.js'
@@ -11,7 +12,7 @@ export const compressors = {
   SNAPPY: snappyUncompressor(),
   GZIP: input => pako.ungzip(input),
   BROTLI,
-  ZSTD: () => new Uint8Array(), // TODO
+  ZSTD: input => ZSTD(input),
   LZ4,
   LZ4_RAW,
 }
