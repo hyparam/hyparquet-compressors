@@ -1,8 +1,9 @@
 {
   "name": "hyparquet-compressors",
   "version": "0.1.0",
-  "description": "hyparquet decompressors",
+  "description": "Decompressors for hyparquet",
   "keywords": [
+    "brotli",
     "decompress",
     "decompression",
     "decompressor",
@@ -17,6 +18,9 @@
     "url": "git+https://github.com/hyparam/hyparquet-compressors.git"
   },
   "main": "src/index.js",
+  "files": [
+    "src"
+  ],
   "type": "module",
   "types": "src/index.d.ts",
   "scripts": {

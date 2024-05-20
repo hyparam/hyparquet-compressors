@@ -1,5 +1,6 @@
 # hyparquet decompressors
 
+[![npm](https://img.shields.io/npm/v/hyparquet-compressors)](https://www.npmjs.com/package/hyparquet-compressors)
 [![workflow status](https://github.com/hyparam/hyparquet-compressors/actions/workflows/ci.yml/badge.svg)](https://github.com/hyparam/hyparquet-compressors/actions)
 [![mit license](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 ![coverage](https://img.shields.io/badge/Coverage-97-darkred)
