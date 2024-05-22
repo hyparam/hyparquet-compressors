@@ -3,7 +3,7 @@
 [![npm](https://img.shields.io/npm/v/hyparquet-compressors)](https://www.npmjs.com/package/hyparquet-compressors)
 [![workflow status](https://github.com/hyparam/hyparquet-compressors/actions/workflows/ci.yml/badge.svg)](https://github.com/hyparam/hyparquet-compressors/actions)
 [![mit license](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-![coverage](https://img.shields.io/badge/Coverage-97-darkred)
+![coverage](https://img.shields.io/badge/Coverage-93-darkred)
 
 This package exports a `compressors` object intended to be passed into [hyparquet](https://github.com/hyparam/hyparquet).
 
@@ -44,7 +44,7 @@ Parquet compression types supported with `hyparquet-compressors`:
  - https://en.wikipedia.org/wiki/LZ4_(compression_algorithm)
  - https://en.wikipedia.org/wiki/Snappy_(compression)
  - https://en.wikipedia.org/wiki/Zstd
+ - https://github.com/101arrowz/fflate
  - https://github.com/101arrowz/fzstd
  - https://github.com/foliojs/brotli.js
  - https://github.com/hyparam/hysnappy
- - https://github.com/nodeca/pako
