@@ -1,6 +1,6 @@
 {
   "name": "hyparquet-compressors",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Decompressors for hyparquet",
   "keywords": [
     "brotli",
@@ -8,6 +8,7 @@
     "decompression",
     "decompressor",
     "gzip",
+    "gunzip",
     "lz4",
     "hyparquet",
     "parquet",
