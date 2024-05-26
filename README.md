@@ -24,17 +24,45 @@ await parquetRead({ file, compressors, onComplete: console.log })
 
 See [hyparquet](https://github.com/hyparam/hyparquet) repo for further info.
 
-# Supported compression formats
+# Compression formats
 
 Parquet compression types supported with `hyparquet-compressors`:
  - [X] Uncompressed
  - [X] Snappy
- - [x] GZip
+ - [x] Gzip
  - [ ] LZO
  - [X] Brotli
  - [X] LZ4
  - [X] ZSTD
  - [X] LZ4_RAW
+
+## Snappy
+
+Snappy compression uses [hysnappy](https://github.com/hyparam/hysnappy) for fast snappy decompression using minimal wasm.
+
+## Gzip
+
+New gzip implementation adapted from [fflate](https://github.com/101arrowz/fflate).
+Includes modifications to handle repeated back-to-back gzip streams that sometimes occur in parquet files, but was not supported by fflate.
+
+## Brotli
+
+Uses [brotli.js](https://github.com/foliojs/brotli.js) for brotli decompression.
+
+## LZ4
+
+New LZ4 implementation includes support for legacy hadoop LZ4 frame format used on some old parquet files.
+
+## Zstd
+
+Uses [fzstd](https://github.com/101arrowz/fzstd) for Zstandard decompression.
+
+# Bundle size
+
+| File | Size |
+| - | - |
+| hyparquet-compressors.min.js | 502.1kb |
+| hyparquet-compressors.min.js.gz | 102.2kb |
 
 # References
 
