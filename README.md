@@ -1,5 +1,7 @@
 # hyparquet decompressors
 
+![hyparquet parakeets](hyparquet-compressors.jpg)
+
 [![npm](https://img.shields.io/npm/v/hyparquet-compressors)](https://www.npmjs.com/package/hyparquet-compressors)
 [![workflow status](https://github.com/hyparam/hyparquet-compressors/actions/workflows/ci.yml/badge.svg)](https://github.com/hyparam/hyparquet-compressors/actions)
 [![mit license](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
@@ -43,11 +45,11 @@ Snappy compression uses [hysnappy](https://github.com/hyparam/hysnappy) for fast
 ## Gzip
 
 New gzip implementation adapted from [fflate](https://github.com/101arrowz/fflate).
-Includes modifications to handle repeated back-to-back gzip streams that sometimes occur in parquet files, but was not supported by fflate.
+Includes modifications to handle repeated back-to-back gzip streams that sometimes occur in parquet files (but was not supported by fflate).
 
 ## Brotli
 
-Includes a minimal port of [brotli.js](https://github.com/foliojs/brotli.js) which compresses the brotli dictionary using gzip and base64 to minimize the distribution bundle size.
+Includes a minimal port of [brotli.js](https://github.com/foliojs/brotli.js) which pre-compresses the brotli dictionary using gzip to minimize the distribution bundle size.
 
 ## LZ4
 
@@ -60,7 +62,7 @@ Uses [fzstd](https://github.com/101arrowz/fzstd) for Zstandard decompression.
 # Bundle size
 
 | File | Size |
-| - | - |
+| --- | --- |
 | hyparquet-compressors.min.js | 116.1kb |
 | hyparquet-compressors.min.js.gz | 75.2kb |
 
