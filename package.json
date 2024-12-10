@@ -1,6 +1,6 @@
 {
   "name": "hyparquet-compressors",
-  "version": "0.1.4",
+  "version": "1.0.0",
   "description": "Decompressors for hyparquet",
   "keywords": [
     "brotli",
