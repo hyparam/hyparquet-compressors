@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import packageJson from '../package.json'
+import packageJson from '../package.json' with { type: 'json' }
 
 describe('package.json', () => {
   it('should have the correct name', () => {
@@ -17,5 +17,8 @@ describe('package.json', () => {
     Object.values(allDependencies).forEach(version => {
       expect(version).toMatch(/^\d+\.\d+\.\d+$/)
     })
+  })
+  it('should have no peerDependencies', () => {
+    expect('peerDependencies' in packageJson).toBe(false)
   })
 })

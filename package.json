@@ -28,26 +28,26 @@
   "scripts": {
     "build": "rollup -c",
     "coverage": "vitest run --coverage",
-    "lint": "eslint .",
+    "lint": "eslint",
     "test": "vitest run"
   },
   "dependencies": {
     "fzstd": "0.1.1",
-    "hysnappy": "0.3.1"
+    "hysnappy": "1.0.0"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "7.24.6",
-    "@rollup/plugin-commonjs": "25.0.8",
-    "@rollup/plugin-node-resolve": "15.2.3",
+    "@babel/eslint-parser": "7.25.9",
+    "@rollup/plugin-commonjs": "28.0.1",
+    "@rollup/plugin-node-resolve": "15.3.0",
     "@rollup/plugin-terser": "0.4.4",
-    "@types/node": "20.12.12",
-    "@vitest/coverage-v8": "1.6.0",
-    "eslint": "8.57.0",
-    "eslint-plugin-import": "2.29.1",
-    "eslint-plugin-jsdoc": "48.2.6",
-    "hyparquet": "0.9.7",
-    "rollup": "4.18.0",
-    "typescript": "5.4.5",
-    "vitest": "1.6.0"
+    "@types/node": "22.10.1",
+    "@vitest/coverage-v8": "2.1.8",
+    "eslint": "9.16.0",
+    "eslint-plugin-import": "2.31.0",
+    "eslint-plugin-jsdoc": "50.6.0",
+    "hyparquet": "1.6.3",
+    "rollup": "4.28.1",
+    "typescript": "5.7.2",
+    "vitest": "2.1.8"
   }
 }
