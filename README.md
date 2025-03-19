@@ -3,8 +3,9 @@
 ![hyparquet parakeets](hyparquet-compressors.jpg)
 
 [![npm](https://img.shields.io/npm/v/hyparquet-compressors)](https://www.npmjs.com/package/hyparquet-compressors)
+[![minzipped](https://img.shields.io/bundlephobia/minzip/hyparquet-compressors)](https://www.npmjs.com/package/hyparquet-compressors)
 [![workflow status](https://github.com/hyparam/hyparquet-compressors/actions/workflows/ci.yml/badge.svg)](https://github.com/hyparam/hyparquet-compressors/actions)
-[![mit license](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![mit license](https://img.shields.io/badge/License-MIT-orange.svg)](https://opensource.org/licenses/MIT)
 ![coverage](https://img.shields.io/badge/Coverage-86-darkred)
 
 This package exports a `compressors` object intended to be passed into [hyparquet](https://github.com/hyparam/hyparquet).
@@ -24,7 +25,7 @@ import { compressors } from 'hyparquet-compressors'
 await parquetRead({ file, compressors, onComplete: console.log })
 ```
 
-See [hyparquet](https://github.com/hyparam/hyparquet) repo for further info.
+See [hyparquet](https://github.com/hyparam/hyparquet) repo for more info.
 
 # Compression formats
 

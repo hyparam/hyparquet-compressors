@@ -2,6 +2,8 @@
   "name": "hyparquet-compressors",
   "version": "1.0.0",
   "description": "Decompressors for hyparquet",
+  "author": "Hyperparam",
+  "homepage": "https://hyperparam.app",
   "keywords": [
     "brotli",
     "decompress",
@@ -36,18 +38,17 @@
     "hysnappy": "1.0.0"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "7.25.9",
-    "@rollup/plugin-commonjs": "28.0.1",
-    "@rollup/plugin-node-resolve": "15.3.0",
+    "@babel/eslint-parser": "7.26.10",
+    "@rollup/plugin-commonjs": "28.0.3",
+    "@rollup/plugin-node-resolve": "16.0.1",
     "@rollup/plugin-terser": "0.4.4",
-    "@types/node": "22.10.1",
-    "@vitest/coverage-v8": "2.1.8",
-    "eslint": "9.16.0",
-    "eslint-plugin-import": "2.31.0",
-    "eslint-plugin-jsdoc": "50.6.0",
-    "hyparquet": "1.6.3",
-    "rollup": "4.28.1",
-    "typescript": "5.7.2",
-    "vitest": "2.1.8"
+    "@types/node": "22.13.10",
+    "@vitest/coverage-v8": "3.0.9",
+    "eslint": "9.22.0",
+    "eslint-plugin-jsdoc": "50.6.8",
+    "hyparquet": "1.9.1",
+    "rollup": "4.36.0",
+    "typescript": "5.8.2",
+    "vitest": "3.0.9"
   }
 }
