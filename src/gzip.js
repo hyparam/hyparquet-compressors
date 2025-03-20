@@ -6,19 +6,6 @@ import { fixedDistance, fixedDistanceExtraBits, fixedDistanceMap, fixedLength, f
 const codeLengthIndexMap = new Uint8Array([16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15])
 
 /**
- * find max of array
- * @param {Uint8Array | number[]} a
- * @returns {number}
- */
-function max(a) {
-  let m = a[0]
-  for (let i = 1; i < a.length; i++) {
-    if (a[i] > m) m = a[i]
-  }
-  return m
-}
-
-/**
  * read d, starting at bit p and mask with m
  * @param {Uint8Array} input
  * @param {number} pos
@@ -137,7 +124,7 @@ export function gunzip(input, output, inputIndex = 0, outputIndex = 0) {
           codeLengthTree[codeLengthIndexMap[i]] = bits(input, pos + i * 3, 7)
         }
         pos += hcLengths * 3
-        const codeLengthBits = max(codeLengthTree)
+        const codeLengthBits = Math.max(...codeLengthTree)
         const clbMask = (1 << codeLengthBits) - 1
         const codeLengthMap = huffMap(codeLengthTree, codeLengthBits, 1)
         for (let i = 0; i < tl;) {
@@ -168,8 +155,8 @@ export function gunzip(input, output, inputIndex = 0, outputIndex = 0) {
         const lengthTree = lengthDistanceTree.subarray(0, hLiteral)
         const distanceTree = lengthDistanceTree.subarray(hLiteral)
         // max length/dist bits
-        lengthBits = max(lengthTree)
-        distBits = max(distanceTree)
+        lengthBits = Math.max(...lengthTree)
+        distBits = Math.max(...distanceTree)
         lengthMap = huffMap(lengthTree, lengthBits, 1)
         distMap = huffMap(distanceTree, distBits, 1)
       } else throw new Error('invalid block type')
