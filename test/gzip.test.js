@@ -54,4 +54,10 @@ describe('gzip compressor', () => {
       expect(toJson(data)).toEqual(JSON.parse(expected))
     } })
   })
+
+  it('read gzip with unknown length', () => {
+    const input = new Uint8Array([31, 139, 8, 0, 77, 204, 77, 102, 0, 3, 227, 230, 22, 83, 4, 0, 117, 18, 225, 170, 4, 0, 0, 0])
+    const resized = gunzip(input)
+    expect(resized).toEqual(new Uint8Array([11, 11, 22, 33]))
+  })
 })

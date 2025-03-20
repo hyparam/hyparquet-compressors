@@ -48,16 +48,23 @@ Parquet compression types supported with `hyparquet-compressors`:
 
 ### Snappy
 
-Snappy compression uses [hysnappy](https://github.com/hyparam/hysnappy) for fast snappy decompression using minimal wasm.
+Snappy compression uses [hysnappy](https://github.com/hyparam/hysnappy) for fast snappy decompression using a minimal [WASM](https://en.wikipedia.org/wiki/WebAssembly) module.
+
+We load the wasm module _synchronously_ from base64 in the js file. This avoids a network request, and greatly simplifies bundling and serving wasm.
 
 ### Gzip
 
 New gzip implementation adapted from [fflate](https://github.com/101arrowz/fflate).
-Includes modifications to handle repeated back-to-back gzip streams that sometimes occur in parquet files (but was not supported by fflate).
+Includes modifications to handle repeated back-to-back gzip streams that sometimes occur in parquet files (but are not supported by fflate).
+
+For gzip, the `output` buffer argument is optional:
+ - If `output` is defined, the decompressor will write to `output` until it is full.
+ - If `output` is undefined, the decompressor will allocate a new buffer, and expand it as needed to fit the uncompressed gzip data. Importantly, the caller should use the _returned_ buffer.
 
 ### Brotli
 
-Includes a minimal port of [brotli.js](https://github.com/foliojs/brotli.js) which pre-compresses the brotli dictionary using gzip to minimize the distribution bundle size.
+Includes a minimal port of [brotli.js](https://github.com/foliojs/brotli.js).
+Our implementation uses gzip to pre-compress the brotli dictionary, in order to  minimize the bundle size.
 
 ### LZ4
 

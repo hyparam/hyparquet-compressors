@@ -68,14 +68,16 @@ function gzipStart(input, i) {
 /**
  * GZip decompression
  * @param {Uint8Array} input
- * @param {Uint8Array} out
+ * @param {Uint8Array} [output]
  * @param {number} [inputIndex]
  * @param {number} [outputIndex]
+ * @returns {Uint8Array}
  */
-export function gunzip(input, out, inputIndex = 0, outputIndex = 0) {
-  if (!(input.length - inputIndex)) return
+export function gunzip(input, output, inputIndex = 0, outputIndex = 0) {
+  let out = output ?? new Uint8Array(1024) // initial size
+  if (!(input.length - inputIndex)) return out
   const payloadStart = gzipStart(input, inputIndex)
-  if (payloadStart === input.length - 8) return
+  if (payloadStart === input.length - 8) return out
   if (payloadStart > input.length - 8) throw new Error('unexpected EOF')
   let pos = payloadStart * 8 // position in bits
   let final = 0 // last chunk?
@@ -84,6 +86,16 @@ export function gunzip(input, out, inputIndex = 0, outputIndex = 0) {
   let lengthMap
   let distMap
   const totalBits = input.length * 8
+
+  /** @param {number} length */
+  function ensureSize(length) {
+    if (!output && length > out.length) {
+      const old = out
+      out = new Uint8Array(Math.max(old.length * 2, length))
+      out.set(old)
+    }
+  }
+
   do {
     if (!lengthMap) {
       // final chunk is next?
@@ -98,6 +110,7 @@ export function gunzip(input, out, inputIndex = 0, outputIndex = 0) {
         const t = s + l
         if (t > input.length) throw new Error('unexpected EOF')
         // copy uncompressed data
+        ensureSize(outputIndex + l)
         out.set(input.subarray(s, t), outputIndex)
         outputIndex += l
         pos = t * 8
@@ -160,6 +173,8 @@ export function gunzip(input, out, inputIndex = 0, outputIndex = 0) {
       } else throw new Error('invalid block type')
       if (pos > totalBits) throw new Error('unexpected EOF')
     }
+
+    ensureSize(outputIndex + 131072) // max chunk size?
     const lms = (1 << lengthBits) - 1
     const dms = (1 << distBits) - 1
     let lpos = pos
@@ -199,6 +214,7 @@ export function gunzip(input, out, inputIndex = 0, outputIndex = 0) {
         if (pos > totalBits) throw new Error('unexpected EOF')
         const end = outputIndex + add
         if (outputIndex < dt) throw new Error('unexpected dictionary case')
+        ensureSize(end)
         for (; outputIndex < end; outputIndex++) out[outputIndex] = out[outputIndex - dt]
       }
     }
@@ -211,4 +227,7 @@ export function gunzip(input, out, inputIndex = 0, outputIndex = 0) {
     const nextBlock = Math.ceil(pos / 8) + 8 // 8 byte gzip footer
     gunzip(input, out, nextBlock, outputIndex)
   }
+
+  if (!output) return out.subarray(0, outputIndex)
+  return out
 }
