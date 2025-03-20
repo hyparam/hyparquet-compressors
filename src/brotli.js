@@ -3,12 +3,12 @@
  * Copyright 2013 Google Inc, Apache License 2.0
  */
 
-import BrotliBitReader from './brotliBitReader.js'
+import BrotliBitReader from './brotli.bitreader.js'
 import { lookup, lookupOffsets } from './brotliContext.js'
-import { HuffmanCode, readHuffmanCode, readSymbol } from './brotliHuffman.js'
-import { kBlockLengthPrefixCode, kCopyLengthPrefixCode, kCopyRangeLut, kInsertLengthPrefixCode, kInsertRangeLut } from './brotliPrefix.js'
+import { HuffmanCode, readHuffmanCode, readSymbol } from './brotli.huffman.js'
+import { kBlockLengthPrefixCode, kCopyLengthPrefixCode, kCopyRangeLut, kInsertLengthPrefixCode, kInsertRangeLut } from './brotli.prefix.js'
 import { BrotliInput, BrotliOutput } from './brotliStreams.js'
-import { kNumTransforms, transformDictionaryWord } from './brotliTransform.js'
+import { kNumTransforms, transformDictionaryWord } from './brotli.transform.js'
 
 const kNumLiteralCodes = 256
 const kNumInsertAndCopyCodes = 704

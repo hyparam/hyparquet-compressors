@@ -15,7 +15,7 @@
    Transformations on dictionary words.
 */
 
-import { getDictionary } from './brotliDictionary.js'
+import { getDictionary } from './brotli.dictionary.js'
 
 const kIdentity = 0
 const kOmitLast1 = 1

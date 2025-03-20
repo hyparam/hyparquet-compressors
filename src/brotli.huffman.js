@@ -151,7 +151,7 @@ export function buildHuffmanTable(root_table, table, root_bits, code_lengths, co
 }
 
 /**
- * @typedef {import('./brotliBitReader.js').default} BrotliBitReader
+ * @typedef {import('./brotli.bitreader.js').default} BrotliBitReader
  * @param {number} alphabet_size
  * @param {HuffmanCode[]} tables
  * @param {number} table
