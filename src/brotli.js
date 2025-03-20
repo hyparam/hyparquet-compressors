@@ -5,20 +5,18 @@
 
 import BrotliBitReader from './brotli.bitreader.js'
 import { lookup, lookupOffsets } from './brotli.context.js'
+import { decodeContextMap } from './brotli.contextmap.js'
 import { HuffmanCode, readHuffmanCode, readSymbol } from './brotli.huffman.js'
 import { kBlockLengthPrefixCode, kCopyLengthPrefixCode, kCopyRangeLut, kInsertLengthPrefixCode, kInsertRangeLut } from './brotli.prefix.js'
 import { BrotliInput, BrotliOutput } from './brotli.streams.js'
 import { kNumTransforms, transformDictionaryWord } from './brotli.transform.js'
+import { HUFFMAN_MAX_TABLE_SIZE } from './gzip.huffman.js'
 
 const kNumLiteralCodes = 256
 const kNumInsertAndCopyCodes = 704
 const kNumBlockLengthCodes = 26
 const kLiteralContextBits = 6
 const kDistanceContextBits = 2
-
-/* Maximum possible Huffman table size for an alphabet size of 704, max code
- * length 15 and root table bits 8. */
-const HUFFMAN_MAX_TABLE_SIZE = 1080
 
 const NUM_DISTANCE_SHORT_CODES = 16
 const kDistanceShortCodeIndexOffset = new Uint8Array([
@@ -72,8 +70,7 @@ function brotli(input, output) {
   let input_end = 0
   let window_bits = 0
   let max_distance = 0
-  /* This ring buffer holds a few past copy distances that will be used by */
-  /* some special distance codes. */
+  // This ring buffer holds a few past copy distances that will be used by special distance codes
   const dist_rb = [ 16, 15, 11, 4 ]
   let dist_rb_idx = 0
   /* The previous 2 bytes used for context */
@@ -81,15 +78,15 @@ function brotli(input, output) {
   let prev_byte2 = 0
   const hgroup = [new HuffmanTreeGroup(0, 0), new HuffmanTreeGroup(0, 0), new HuffmanTreeGroup(0, 0)]
 
-  /* We need the slack region for the following reasons:
-       - always doing two 8-byte copies for fast backward copying
-       - transforms
-       - flushing the input ringbuffer when decoding uncompressed blocks */
+  // We need the slack region for the following reasons:
+  //   - always doing two 8-byte copies for fast backward copying
+  //   - transforms
+  //   - flushing the input ringbuffer when decoding uncompressed blocks
   const kRingBufferWriteAheadSlack = 128 + BrotliBitReader.READ_SIZE
 
   const br = new BrotliBitReader(input)
 
-  /* Decode window size. */
+  // Decode window size
   window_bits = decodeWindowBits(br)
   const max_backward_distance = (1 << window_bits) - 16
 
@@ -121,10 +118,10 @@ function brotli(input, output) {
 
     br.readMoreInput()
 
-    const _out = DecodeMetaBlockLength(br)
+    const _out = decodeMetaBlockLength(br)
     meta_block_remaining_len = _out.meta_block_length
     if (pos + meta_block_remaining_len > output.buffer.length) {
-      /* We need to grow the output buffer to fit the additional data. */
+      // We need to grow the output buffer to fit the additional data
       const tmp = new Uint8Array( pos + meta_block_remaining_len )
       tmp.set( output.buffer )
       output.buffer = tmp
@@ -136,7 +133,7 @@ function brotli(input, output) {
 
       for (; meta_block_remaining_len > 0; --meta_block_remaining_len) {
         br.readMoreInput()
-        /* Read one byte and ignore it. */
+        // Read one byte and ignore it
         br.readBits(8)
       }
 
@@ -175,13 +172,8 @@ function brotli(input, output) {
       context_modes[i] = br.readBits(2) << 1
     }
 
-    const _o1 = DecodeContextMap(num_block_types[0] << kLiteralContextBits, br)
-    const num_literal_htrees = _o1.num_htrees
-    const { context_map } = _o1
-
-    const _o2 = DecodeContextMap(num_block_types[2] << kDistanceContextBits, br)
-    const num_dist_htrees = _o2.num_htrees
-    const dist_context_map = _o2.context_map
+    const [num_literal_htrees, context_map] = decodeContextMap(num_block_types[0] << kLiteralContextBits, br)
+    const [num_dist_htrees, dist_context_map] = decodeContextMap(num_block_types[2] << kDistanceContextBits, br)
 
     hgroup[0] = new HuffmanTreeGroup(kNumLiteralCodes, num_literal_htrees)
     hgroup[1] = new HuffmanTreeGroup(kNumInsertAndCopyCodes, num_block_types[1])
@@ -281,8 +273,7 @@ function brotli(input, output) {
         }
       }
 
-      /* Convert the distance code to the actual distance by possibly looking */
-      /* up past distnaces from the ringbuffer. */
+      // Convert distance code to actual distance by possibly looking up past distnaces from the ringbuffer
       const distance = translateShortCodes(distance_code, dist_rb, dist_rb_idx)
       if (distance < 0) throw new Error('[BrotliDecompress] invalid distance')
 
@@ -340,14 +331,14 @@ function brotli(input, output) {
         }
       }
 
-      /* When we get here, we must have inserted at least one literal and */
-      /* made a copy of at least length two, therefore accessing the last 2 */
-      /* bytes is valid. */
+      // When we get here, we must have inserted at least one literal and
+      // made a copy of at least length two, therefore accessing the last 2
+      // bytes is valid
       prev_byte1 = ringbuffer[pos - 1 & ringbuffer_mask]
       prev_byte2 = ringbuffer[pos - 2 & ringbuffer_mask]
     }
 
-    /* Protect pos from overflow, wrap it around at every GB of input data */
+    // Protect pos from overflow, wrap it around at every GB of input data
     pos &= 0x3fffffff
   }
 
@@ -464,7 +455,7 @@ function copyUncompressedBlockToOutput(output, len, pos, ringbuffer, ringbuffer_
   let rb_pos = pos & ringbuffer_mask
   let br_pos = br.pos_ & BrotliBitReader.IBUF_MASK
 
-  /* For short lengths copy byte-by-byte */
+  // For short lengths copy byte-by-byte
   if (len < 8 || br.bit_pos_ + (len << 3) < br.bit_end_pos_) {
     while (len-- > 0) {
       br.readMoreInput()
@@ -478,10 +469,10 @@ function copyUncompressedBlockToOutput(output, len, pos, ringbuffer, ringbuffer_
   }
 
   if (br.bit_end_pos_ < 32) {
-    throw new Error('[CopyUncompressedBlockToOutput] br.bit_end_pos_ < 32')
+    throw new Error('copyUncompressedBlockToOutput: br.bit_end_pos_ < 32')
   }
 
-  /* Copy remaining 0-4 bytes from br.val_ to ringbuffer. */
+  // Copy remaining 0-4 bytes from br.val_ to ringbuffer
   while (br.bit_pos_ < 32) {
     ringbuffer[rb_pos] = br.val_ >>> br.bit_pos_
     br.bit_pos_ += 8
@@ -489,7 +480,7 @@ function copyUncompressedBlockToOutput(output, len, pos, ringbuffer, ringbuffer_
     len--
   }
 
-  /* Copy remaining bytes from br.buf_ to ringbuffer. */
+  // Copy remaining bytes from br.buf_ to ringbuffer
   let nbytes = br.bit_end_pos_ - br.bit_pos_ >> 3
   if (br_pos + nbytes > BrotliBitReader.IBUF_MASK) {
     const tail = BrotliBitReader.IBUF_MASK + 1 - br_pos
@@ -508,8 +499,8 @@ function copyUncompressedBlockToOutput(output, len, pos, ringbuffer, ringbuffer_
   rb_pos += nbytes
   len -= nbytes
 
-  /* If we wrote past the logical end of the ringbuffer, copy the tail of the
-     ringbuffer to its beginning and flush the ringbuffer to the output. */
+  // If we wrote past the logical end of the ringbuffer, copy the tail of the
+  // ringbuffer to its beginning and flush the ringbuffer to the output
   if (rb_pos >= rb_size) {
     output.write(ringbuffer, rb_size)
     rb_pos -= rb_size
@@ -517,26 +508,25 @@ function copyUncompressedBlockToOutput(output, len, pos, ringbuffer, ringbuffer_
       ringbuffer[x] = ringbuffer[rb_size + x]
   }
 
-  /* If we have more to copy than the remaining size of the ringbuffer, then we
-     first fill the ringbuffer from the input and then flush the ringbuffer to
-     the output */
+  // If we have more to copy than the remaining size of the ringbuffer, then we
+  // first fill the ringbuffer from the input and then flush the ringbuffer
   while (rb_pos + len >= rb_size) {
     nbytes = rb_size - rb_pos
     if (br.input_.read(ringbuffer, rb_pos, nbytes) < nbytes) {
-      throw new Error('[CopyUncompressedBlockToOutput] not enough bytes')
+      throw new Error('copyUncompressedBlockToOutput: not enough bytes')
     }
     output.write(ringbuffer, rb_size)
     len -= nbytes
     rb_pos = 0
   }
 
-  /* Copy straight from the input onto the ringbuffer. The ringbuffer will be
-     flushed to the output at a later time. */
+  // Copy straight from the input onto the ringbuffer
+  // Ringbuffer will be flushed to output later
   if (br.input_.read(ringbuffer, rb_pos, len) < len) {
-    throw new Error('[CopyUncompressedBlockToOutput] not enough bytes')
+    throw new Error('copyUncompressedBlockToOutput: not enough bytes')
   }
 
-  /* Restore the state of the bit reader. */
+  // Restore the state of the bit reader
   br.reset()
 }
 
@@ -545,7 +535,7 @@ function copyUncompressedBlockToOutput(output, len, pos, ringbuffer, ringbuffer_
  * @param {BrotliBitReader} br
  * @returns {number}
  */
-function decodeVarLenUint8(br) {
+export function decodeVarLenUint8(br) {
   if (br.readBits(1)) {
     const nbits = br.readBits(3)
     if (nbits === 0) {
@@ -557,19 +547,18 @@ function decodeVarLenUint8(br) {
   return 0
 }
 
-function MetaBlockLength() {
-  this.meta_block_length = 0
-  this.input_end = 0
-  this.is_uncompressed = 0
-  this.is_metadata = false
-}
-
 /**
+ * @typedef {{ input_end: number, is_metadata: boolean, meta_block_length: number, is_uncompressed: number }} MetaBlockLength
  * @param {BrotliBitReader} br
  * @returns {MetaBlockLength}
  */
-function DecodeMetaBlockLength(br) {
-  const out = new MetaBlockLength
+function decodeMetaBlockLength(br) {
+  const out = {
+    meta_block_length: 0,
+    input_end: 0,
+    is_uncompressed: 0,
+    is_metadata: false,
+  }
 
   out.input_end = br.readBits(1)
   if (out.input_end && br.readBits(1)) {
@@ -611,87 +600,6 @@ function DecodeMetaBlockLength(br) {
   }
 
   return out
-}
-
-/**
- * @param {number} context_map_size
- * @param {BrotliBitReader} br
- * @returns {{ num_htrees: number, context_map: Uint8Array }}
- */
-function DecodeContextMap(context_map_size, br) {
-  let max_run_length_prefix = 0
-
-  br.readMoreInput()
-  const num_htrees = decodeVarLenUint8(br) + 1
-
-  const context_map = new Uint8Array(context_map_size)
-  if (num_htrees <= 1) {
-    return { num_htrees, context_map }
-  }
-
-  const use_rle_for_zeros = br.readBits(1)
-  if (use_rle_for_zeros) {
-    max_run_length_prefix = br.readBits(4) + 1
-  }
-
-  const table = []
-  for (let i = 0; i < HUFFMAN_MAX_TABLE_SIZE; i++) {
-    table[i] = new HuffmanCode(0, 0)
-  }
-
-  readHuffmanCode(num_htrees + max_run_length_prefix, table, 0, br)
-
-  for (let i = 0; i < context_map_size;) {
-    br.readMoreInput()
-    const code = readSymbol(table, 0, br)
-    if (code === 0) {
-      context_map[i] = 0
-      i++
-    } else if (code <= max_run_length_prefix) {
-      let reps = 1 + (1 << code) + br.readBits(code)
-      while (--reps) {
-        if (i >= context_map_size) {
-          throw new Error('[DecodeContextMap] i >= context_map_size')
-        }
-        context_map[i] = 0
-        i++
-      }
-    } else {
-      context_map[i] = code - max_run_length_prefix
-      i++
-    }
-  }
-  if (br.readBits(1)) {
-    inverseMoveToFrontTransform(context_map, context_map_size)
-  }
-
-  return { num_htrees, context_map }
-}
-
-/**
- * @param {Uint8Array} v
- * @param {number} index
- */
-function moveToFront(v, index) {
-  const value = v[index]
-  for (let i = index; i; i--) v[i] = v[i - 1]
-  v[0] = value
-}
-
-/**
- * @param {Uint8Array} v
- * @param {number} v_len
- */
-function inverseMoveToFrontTransform(v, v_len) {
-  const mtf = new Uint8Array(256)
-  for (let i = 0; i < 256; i++) {
-    mtf[i] = i
-  }
-  for (let i = 0; i < v_len; i++) {
-    const index = v[i]
-    v[i] = mtf[index]
-    if (index) moveToFront(mtf, index)
-  }
 }
 
 /**

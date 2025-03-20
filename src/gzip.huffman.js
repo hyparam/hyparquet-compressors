@@ -1,6 +1,10 @@
 // Adapted from https://github.com/101arrowz/fflate Copyright (c) 2023 Arjun Barrett
 // https://tools.ietf.org/html/rfc1951
 
+/* Maximum possible Huffman table size for an alphabet size of 704, max code
+ * length 15 and root table bits 8. */
+export const HUFFMAN_MAX_TABLE_SIZE = 1080
+
 // fixed length extra bits
 export const fixedLengthExtraBits = new Uint8Array([
   0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0, /* unused */ 0, 0, /* impossible */ 0,
