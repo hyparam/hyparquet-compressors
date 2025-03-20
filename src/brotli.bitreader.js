@@ -31,7 +31,7 @@ const kBitMask = new Uint32Array([
  * @typedef {import('./brotli.streams.js').BrotliInput} BrotliInput
  * @param {BrotliInput} input
  */
-function BrotliBitReader(input) {
+export function BrotliBitReader(input) {
   this.buf_ = new Uint8Array(BROTLI_IBUF_SIZE)
   this.input_ = input /* input callback */
 
@@ -132,5 +132,3 @@ BrotliBitReader.prototype.readBits = function(n_bits) {
   this.bit_pos_ += n_bits
   return val
 }
-
-export default BrotliBitReader

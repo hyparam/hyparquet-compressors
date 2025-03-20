@@ -1,10 +1,11 @@
+import { decodeVarLenUint8 } from './brotli.blocks.js'
 import { HuffmanCode, readHuffmanCode, readSymbol } from './brotli.huffman.js'
-import { decodeVarLenUint8 } from './brotli.js'
 import { HUFFMAN_MAX_TABLE_SIZE } from './gzip.huffman.js'
 
 /**
+ * @import {BrotliBitReader} from './brotli.bitreader.js'
  * @param {number} context_map_size
- * @param {import('./brotli.huffman.js').BrotliBitReader} br
+ * @param {BrotliBitReader} br
  * @returns {[number, Uint8Array]} // num_htrees, context_map
  */
 export function decodeContextMap(context_map_size, br) {

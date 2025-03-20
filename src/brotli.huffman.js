@@ -9,13 +9,18 @@ const kCodeLengthCodeOrder = new Uint8Array([
   1, 2, 3, 4, 0, 5, 17, 6, 16, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 ])
 
+const kMaxHuffmanTableSize = new Uint16Array([
+  256, 402, 436, 468, 500, 534, 566, 598, 630, 662, 694, 726, 758, 790, 822,
+  854, 886, 920, 952, 984, 1016, 1048, 1080,
+])
+
 /**
  * @param {number} bits
  * @param {number} value
  */
 export function HuffmanCode(bits, value) {
-  this.bits = bits /* number of bits used for this symbol */
-  this.value = value /* symbol value or table offset */
+  this.bits = bits // number of bits used for this symbol
+  this.value = value // symbol value or table offset
 }
 
 const kCodeLengthRepeatCode = 16
@@ -80,24 +85,24 @@ function nextTableBitSize(count, len, root_bits) {
  * @param {number} code_lengths_size
  * @returns {number}
  */
-export function buildHuffmanTable(root_table, table, root_bits, code_lengths, code_lengths_size) {
+function buildHuffmanTable(root_table, table, root_bits, code_lengths, code_lengths_size) {
   const start_table = table
-  const count = new Int32Array(MAX_LENGTH + 1) /* number of codes of each length */
-  const offset = new Int32Array(MAX_LENGTH + 1) /* offsets in sorted table for each length */
-  const sorted = new Int32Array(code_lengths_size) /* symbols sorted by code length */
+  const count = new Int32Array(MAX_LENGTH + 1) // number of codes of each length
+  const offset = new Int32Array(MAX_LENGTH + 1) // offsets in sorted table for each length
+  const sorted = new Int32Array(code_lengths_size) // symbols sorted by code length
 
-  /* build histogram of code lengths */
+  // build histogram of code lengths
   for (let i = 0; i < code_lengths_size; i++) {
     count[code_lengths[i]]++
   }
 
-  /* generate offsets into sorted symbol table by code length */
+  // generate offsets into sorted symbol table by code length
   offset[1] = 0
   for (let i = 1; i < MAX_LENGTH; i++) {
     offset[i + 1] = offset[i] + count[i]
   }
 
-  /* sort symbols by length, by symbol order within each length */
+  // sort symbols by length, by symbol order within each length
   for (let i = 0; i < code_lengths_size; i++) {
     if (code_lengths[i] !== 0) {
       sorted[offset[code_lengths[i]]++] = i
@@ -108,7 +113,7 @@ export function buildHuffmanTable(root_table, table, root_bits, code_lengths, co
   let table_size = 1 << table_bits
   let total_size = table_size // sum of root table size and 2nd level table sizes
 
-  /* special case code with only one value */
+  // special case code with only one value
   if (offset[MAX_LENGTH] === 1) {
     for (let key = 0; key < total_size; ++key) {
       root_table[table + key] = new HuffmanCode(0, sorted[0] & 0xffff)
@@ -117,7 +122,7 @@ export function buildHuffmanTable(root_table, table, root_bits, code_lengths, co
     return total_size
   }
 
-  /* fill in root table */
+  // fill in root table
   let key = 0 // reversed prefix code
   let symbol = 0 // symbol index in original or sorted table
   for (let len = 1, step = 2; len <= root_bits; ++len, step <<= 1) {
@@ -128,7 +133,7 @@ export function buildHuffmanTable(root_table, table, root_bits, code_lengths, co
     }
   }
 
-  /* fill in 2nd level tables and add pointers to root table */
+  // fill in 2nd level tables and add pointers to root table
   const mask = total_size - 1
   let low = -1 // low bits for current root entry
   for (let len = root_bits + 1, step = 2; len <= MAX_LENGTH; ++len, step <<= 1) {
@@ -151,7 +156,7 @@ export function buildHuffmanTable(root_table, table, root_bits, code_lengths, co
 }
 
 /**
- * @typedef {import('./brotli.bitreader.js').default} BrotliBitReader
+ * @import {BrotliBitReader} from './brotli.bitreader.js'
  * @param {number} alphabet_size
  * @param {HuffmanCode[]} tables
  * @param {number} table
@@ -163,12 +168,12 @@ export function readHuffmanCode(alphabet_size, tables, table, br) {
 
   br.readMoreInput()
 
-  /* simple_code_or_skip is used as follows:
-     1 for simple code;
-     0 for no skipping, 2 skips 2 code lengths, 3 skips 3 code lengths */
+  // simple_code_or_skip is used as follows:
+  // - 1 for simple code;
+  // - 0 for no skipping, 2 skips 2 code lengths, 3 skips 3 code lengths
   const simple_code_or_skip = br.readBits(2)
   if (simple_code_or_skip === 1) {
-    /* Read symbols, codes & code lengths directly. */
+    // Read symbols, codes & code lengths directly
     let max_bits_counter = alphabet_size - 1
     let max_bits = 0
     const symbols = new Int32Array(4)
@@ -218,11 +223,11 @@ export function readHuffmanCode(alphabet_size, tables, table, br) {
       }
       break
     }
-  } else { /* Decode Huffman-coded code lengths. */
+  } else { // Decode Huffman-coded code lengths
     const code_length_code_lengths = new Uint8Array(CODE_LENGTH_CODES)
     let space = 32
     let num_codes = 0
-    /* Static Huffman code for the code length code lengths */
+    // Static Huffman code for the code length code lengths
     const huff = [
       new HuffmanCode(2, 0), new HuffmanCode(2, 4), new HuffmanCode(2, 3), new HuffmanCode(3, 2),
       new HuffmanCode(2, 0), new HuffmanCode(2, 4), new HuffmanCode(2, 3), new HuffmanCode(4, 1),
@@ -346,4 +351,29 @@ function readHuffmanCodeLengths(code_length_code_lengths, num_symbols, code_leng
 
   for (; symbol < num_symbols; symbol++)
     code_lengths[symbol] = 0
+}
+
+
+/**
+ * Contains a collection of huffman trees with the same alphabet size.
+ *
+ * @param {number} alphabet_size
+ * @param {number} num_htrees
+ */
+export function HuffmanTreeGroup(alphabet_size, num_htrees) {
+  this.alphabet_size = alphabet_size
+  this.num_htrees = num_htrees
+  this.codes = new Array(num_htrees + num_htrees * kMaxHuffmanTableSize[alphabet_size + 31 >>> 5])
+  this.htrees = new Uint32Array(num_htrees)
+}
+
+/**
+ * @param {BrotliBitReader} br
+ */
+HuffmanTreeGroup.prototype.decode = function(br) {
+  let next = 0
+  for (let i = 0; i < this.num_htrees; i++) {
+    this.htrees[i] = next
+    next += readHuffmanCode(this.alphabet_size, this.codes, next, br)
+  }
 }
