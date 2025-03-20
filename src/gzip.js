@@ -57,10 +57,12 @@ function shft(p) {
  * @returns {number}
  */
 function gzipStart(input, i) {
-  if (input[i++] !== 31 || input[i++] !== 139 || input[i++] !== 8) throw new Error('invalid gzip data')
+  // if missing gzip header, assume raw deflate stream
+  if (input[i++] !== 31 || input[i++] !== 139 || input[i++] !== 8) return 0
   const flag = input[i++]
-  i += 6
-  if (flag & 4) i += (input[i + 10] | input[i + 11] << 8) + 2
+  i += 6 // skip header
+  if (flag & 4) i += (input[i + 10] | input[i + 11] << 8) + 2 // skip extra
+  // skip name and comment
   for (let zs = (flag >> 3 & 1) + (flag >> 4 & 1); zs > 0; zs -= Number(!input[i++]));
   return i + (flag & 2)
 }
