@@ -219,15 +219,15 @@ function brotli(input, output) {
       } else {
         distance_code = 0
       }
-      const insert_code = kInsertRangeLut[range_idx] + (cmd_code >> 3 & 7)
-      const copy_code = kCopyRangeLut[range_idx] + (cmd_code & 7)
-      const insert_length = kInsertLengthPrefixCode[insert_code].offset +
-          br.readBits(kInsertLengthPrefixCode[insert_code].nbits)
-      const copy_length = kCopyLengthPrefixCode[copy_code].offset +
-          br.readBits(kCopyLengthPrefixCode[copy_code].nbits)
+      const insertIndex = kInsertRangeLut[range_idx] + (cmd_code >> 3 & 7)
+      const insertPrefix = kInsertLengthPrefixCode[insertIndex]
+      const insertLength = insertPrefix.offset + br.readBits(insertPrefix.nbits)
+      const copyIndex = kCopyRangeLut[range_idx] + (cmd_code & 7)
+      const copyCode = kCopyLengthPrefixCode[copyIndex]
+      const copyLength = copyCode.offset + br.readBits(copyCode.nbits)
       prev_byte1 = ringbuffer[pos - 1 & ringbuffer_mask]
       prev_byte2 = ringbuffer[pos - 2 & ringbuffer_mask]
-      for (let j = 0; j < insert_length; j++) {
+      for (let j = 0; j < insertLength; j++) {
         br.readMoreInput()
 
         if (block_length[0] === 0) {
@@ -253,7 +253,7 @@ function brotli(input, output) {
         }
         pos++
       }
-      meta_block_remaining_len -= insert_length
+      meta_block_remaining_len -= insertLength
       if (meta_block_remaining_len <= 0) break
 
       if (distance_code < 0) {
@@ -266,7 +266,7 @@ function brotli(input, output) {
           dist_context_map_slice = block_type[2] << kDistanceContextBits
         }
         block_length[2]--
-        const context = (copy_length > 4 ? 3 : copy_length - 2) & 0xff
+        const context = (copyLength > 4 ? 3 : copyLength - 2) & 0xff
         const dist_htree_index = dist_context_map[dist_context_map_slice + context]
         distance_code = readSymbol(hgroup[2].codes, hgroup[2].htrees[dist_htree_index], br)
         if (distance_code >= num_direct_distance_codes) {
@@ -295,16 +295,16 @@ function brotli(input, output) {
       let copy_dst = pos & ringbuffer_mask
 
       if (distance > max_distance) {
-        if (copy_length >= minDictionaryWordLength && copy_length <= maxDictionaryWordLength) {
-          let offset = offsetsByLength[copy_length]
+        if (copyLength >= minDictionaryWordLength && copyLength <= maxDictionaryWordLength) {
+          let offset = offsetsByLength[copyLength]
           const word_id = distance - max_distance - 1
-          const shift = sizeBitsByLength[copy_length]
+          const shift = sizeBitsByLength[copyLength]
           const mask = (1 << shift) - 1
           const word_idx = word_id & mask
           const transform_idx = word_id >> shift
-          offset += word_idx * copy_length
+          offset += word_idx * copyLength
           if (transform_idx < kNumTransforms) {
-            const len = transformDictionaryWord(ringbuffer, copy_dst, offset, copy_length, transform_idx)
+            const len = transformDictionaryWord(ringbuffer, copy_dst, offset, copyLength, transform_idx)
             copy_dst += len
             pos += len
             meta_block_remaining_len -= len
@@ -326,11 +326,11 @@ function brotli(input, output) {
           dist_rb_idx++
         }
 
-        if (copy_length > meta_block_remaining_len) {
+        if (copyLength > meta_block_remaining_len) {
           throw new Error('Invalid backward reference')
         }
 
-        for (let j = 0; j < copy_length; j++) {
+        for (let j = 0; j < copyLength; j++) {
           ringbuffer[pos & ringbuffer_mask] = ringbuffer[pos - distance & ringbuffer_mask]
           if ((pos & ringbuffer_mask) === ringbuffer_mask) {
             output.write(ringbuffer, ringbuffer_size)
@@ -431,8 +431,8 @@ HuffmanTreeGroup.prototype.decode = function(br) {
  */
 function readBlockLength(table, index, br) {
   const code = readSymbol(table, index, br)
-  const { nbits } = kBlockLengthPrefixCode[code]
-  return kBlockLengthPrefixCode[code].offset + br.readBits(nbits)
+  const { offset, nbits } = kBlockLengthPrefixCode[code]
+  return offset + br.readBits(nbits)
 }
 
 /**

@@ -1,17 +1,4 @@
 /* Copyright 2013 Google Inc. All Rights Reserved.
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-   http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-
    Lookup tables to map prefix codes to value ranges. This is used during
    decoding of the block lengths, literal insertion lengths and copy lengths.
 */
@@ -19,41 +6,40 @@
 /**
  * Represents the range of values belonging to a prefix code:
  * [offset, offset + 2^nbits)
- * @param {number} offset
- * @param {number} nbits
+ * @param {number[]} pair
+ * @returns {{offset: number, nbits: number}}
  */
-function PrefixCodeRange(offset, nbits) {
-  this.offset = offset
-  this.nbits = nbits
+function prefix([ offset, nbits ]) {
+  return { offset, nbits }
 }
 
 export const kBlockLengthPrefixCode = [
-  new PrefixCodeRange(1, 2), new PrefixCodeRange(5, 2), new PrefixCodeRange(9, 2), new PrefixCodeRange(13, 2),
-  new PrefixCodeRange(17, 3), new PrefixCodeRange(25, 3), new PrefixCodeRange(33, 3), new PrefixCodeRange(41, 3),
-  new PrefixCodeRange(49, 4), new PrefixCodeRange(65, 4), new PrefixCodeRange(81, 4), new PrefixCodeRange(97, 4),
-  new PrefixCodeRange(113, 5), new PrefixCodeRange(145, 5), new PrefixCodeRange(177, 5), new PrefixCodeRange(209, 5),
-  new PrefixCodeRange(241, 6), new PrefixCodeRange(305, 6), new PrefixCodeRange(369, 7), new PrefixCodeRange(497, 8),
-  new PrefixCodeRange(753, 9), new PrefixCodeRange(1265, 10), new PrefixCodeRange(2289, 11), new PrefixCodeRange(4337, 12),
-  new PrefixCodeRange(8433, 13), new PrefixCodeRange(16625, 24),
-]
+  [1, 2], [5, 2], [9, 2], [13, 2],
+  [17, 3], [25, 3], [33, 3], [41, 3],
+  [49, 4], [65, 4], [81, 4], [97, 4],
+  [113, 5], [145, 5], [177, 5], [209, 5],
+  [241, 6], [305, 6], [369, 7], [497, 8],
+  [753, 9], [1265, 10], [2289, 11], [4337, 12],
+  [8433, 13], [16625, 24],
+].map(prefix)
 
 export const kInsertLengthPrefixCode = [
-  new PrefixCodeRange(0, 0), new PrefixCodeRange(1, 0), new PrefixCodeRange(2, 0), new PrefixCodeRange(3, 0),
-  new PrefixCodeRange(4, 0), new PrefixCodeRange(5, 0), new PrefixCodeRange(6, 1), new PrefixCodeRange(8, 1),
-  new PrefixCodeRange(10, 2), new PrefixCodeRange(14, 2), new PrefixCodeRange(18, 3), new PrefixCodeRange(26, 3),
-  new PrefixCodeRange(34, 4), new PrefixCodeRange(50, 4), new PrefixCodeRange(66, 5), new PrefixCodeRange(98, 5),
-  new PrefixCodeRange(130, 6), new PrefixCodeRange(194, 7), new PrefixCodeRange(322, 8), new PrefixCodeRange(578, 9),
-  new PrefixCodeRange(1090, 10), new PrefixCodeRange(2114, 12), new PrefixCodeRange(6210, 14), new PrefixCodeRange(22594, 24),
-]
+  [0, 0], [1, 0], [2, 0], [3, 0],
+  [4, 0], [5, 0], [6, 1], [8, 1],
+  [10, 2], [14, 2], [18, 3], [26, 3],
+  [34, 4], [50, 4], [66, 5], [98, 5],
+  [130, 6], [194, 7], [322, 8], [578, 9],
+  [1090, 10], [2114, 12], [6210, 14], [22594, 24],
+].map(prefix)
 
 export const kCopyLengthPrefixCode = [
-  new PrefixCodeRange(2, 0), new PrefixCodeRange(3, 0), new PrefixCodeRange(4, 0), new PrefixCodeRange(5, 0),
-  new PrefixCodeRange(6, 0), new PrefixCodeRange(7, 0), new PrefixCodeRange(8, 0), new PrefixCodeRange(9, 0),
-  new PrefixCodeRange(10, 1), new PrefixCodeRange(12, 1), new PrefixCodeRange(14, 2), new PrefixCodeRange(18, 2),
-  new PrefixCodeRange(22, 3), new PrefixCodeRange(30, 3), new PrefixCodeRange(38, 4), new PrefixCodeRange(54, 4),
-  new PrefixCodeRange(70, 5), new PrefixCodeRange(102, 5), new PrefixCodeRange(134, 6), new PrefixCodeRange(198, 7),
-  new PrefixCodeRange(326, 8), new PrefixCodeRange(582, 9), new PrefixCodeRange(1094, 10), new PrefixCodeRange(2118, 24),
-]
+  [2, 0], [3, 0], [4, 0], [5, 0],
+  [6, 0], [7, 0], [8, 0], [9, 0],
+  [10, 1], [12, 1], [14, 2], [18, 2],
+  [22, 3], [30, 3], [38, 4], [54, 4],
+  [70, 5], [102, 5], [134, 6], [198, 7],
+  [326, 8], [582, 9], [1094, 10], [2118, 24],
+].map(prefix)
 
 export const kInsertRangeLut = [
   0, 0, 8, 8, 0, 16, 8, 16, 16,
