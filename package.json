@@ -1,6 +1,6 @@
 {
   "name": "hyparquet-compressors",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Decompressors for hyparquet",
   "author": "Hyperparam",
   "homepage": "https://hyperparam.app",
