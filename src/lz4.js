@@ -6,7 +6,7 @@
  * @param {number} outputLength
  * @returns {Uint8Array}
  */
-export function LZ4(input, outputLength) {
+export function decompressLz4(input, outputLength) {
   const output = new Uint8Array(outputLength)
   try {
     let i = 0 // input index
@@ -41,7 +41,7 @@ export function LZ4(input, outputLength) {
  * @param {number} outputLength
  * @returns {Uint8Array}
  */
-export function LZ4_RAW(input, outputLength) {
+export function decompressLz4Raw(input, outputLength) {
   const output = new Uint8Array(outputLength)
   lz4basic(input, output, 0)
   return output

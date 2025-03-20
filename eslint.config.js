@@ -47,7 +47,7 @@ export default [
       'no-constant-condition': 'off',
       'no-extra-parens': 'error',
       'no-multi-spaces': 'error',
-      'no-trailing-spaces': 'warn',
+      'no-trailing-spaces': 'error',
       'no-undef': 'error',
       'no-unused-vars': 'error',
       'no-useless-concat': 'error',

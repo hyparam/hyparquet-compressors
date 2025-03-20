@@ -1,21 +1,26 @@
-import { decompress as ZSTD } from 'fzstd'
-import { snappyUncompressor } from 'hysnappy'
-import { BROTLI } from './brotli.js'
+import { decompress as decompressZstd } from 'fzstd'
+import { snappyUncompress as decompressSnappy } from 'hysnappy'
+import { decompressBrotli } from './brotli.js'
 import { gunzip } from './gzip.js'
-import { LZ4, LZ4_RAW } from './lz4.js'
+import { decompressLz4, decompressLz4Raw } from './lz4.js'
+
+export { compressors } from './compressors.js'
 
 /**
- * @type {import('hyparquet').Compressors}
+ * @param {Uint8Array} input
+ * @param {number} outputLength
+ * @returns {Uint8Array}
  */
-export const compressors = {
-  SNAPPY: snappyUncompressor(),
-  GZIP: (input, length) => {
-    const out = new Uint8Array(length)
-    gunzip(input, out)
-    return out
-  },
-  BROTLI,
-  ZSTD: input => ZSTD(input),
-  LZ4,
-  LZ4_RAW,
+function decompressGzip(input, outputLength) {
+  return gunzip(input, new Uint8Array(outputLength))
+}
+
+export {
+  decompressBrotli,
+  decompressGzip,
+  decompressLz4,
+  decompressLz4Raw,
+  decompressSnappy,
+  decompressZstd,
+  gunzip,
 }

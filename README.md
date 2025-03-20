@@ -78,7 +78,7 @@ Uses [fzstd](https://github.com/101arrowz/fzstd) for Zstandard decompression.
 
 | File | Size |
 | --- | --- |
-| hyparquet-compressors.min.js | 116.1kb |
+| hyparquet-compressors.min.js | 116.4kb |
 | hyparquet-compressors.min.js.gz | 75.2kb |
 
 ## References

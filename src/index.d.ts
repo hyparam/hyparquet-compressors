@@ -13,3 +13,11 @@ export type Compressors = {
 }
 
 export const compressors: Compressors
+
+export function decompressBrotli(input: Uint8Array, outputLength: number): Uint8Array
+export function decompressGzip(input: Uint8Array, outputLength: number): Uint8Array
+export function decompressLz4(input: Uint8Array, outputLength: number): Uint8Array
+export function decompressLz4Raw(input: Uint8Array, outputLength: number): Uint8Array
+export function decompressSnappy(input: Uint8Array, outputLength: number): Uint8Array
+export function decompressZstd(input: Uint8Array, outputLength: number): Uint8Array
+export function gunzip(input: Uint8Array, output?: Uint8Array): Uint8Array

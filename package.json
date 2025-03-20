@@ -31,6 +31,7 @@
     "build": "rollup -c",
     "coverage": "vitest run --coverage",
     "lint": "eslint",
+    "lint:fix": "eslint --fix",
     "test": "vitest run"
   },
   "dependencies": {

@@ -55,7 +55,7 @@ const maxDictionaryWordLength = 24
  * @param {number} outputLength
  * @returns {Uint8Array}
  */
-export function BROTLI(input, outputLength) {
+export function decompressBrotli(input, outputLength) {
   const output = new Uint8Array(outputLength)
   const brotliInput = new BrotliInput(input)
   const brotliOutput = new BrotliOutput(output)
