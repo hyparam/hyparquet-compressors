@@ -28,7 +28,7 @@ const kBitMask = new Uint32Array([
  * Input byte buffer, consist of a ringbuffer and a "slack" region where
  * bytes from the start of the ringbuffer are copied.
  *
- * @typedef {import('./brotliStreams.js').BrotliInput} BrotliInput
+ * @typedef {import('./brotli.streams.js').BrotliInput} BrotliInput
  * @param {BrotliInput} input
  */
 function BrotliBitReader(input) {

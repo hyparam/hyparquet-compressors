@@ -4,10 +4,10 @@
  */
 
 import BrotliBitReader from './brotli.bitreader.js'
-import { lookup, lookupOffsets } from './brotliContext.js'
+import { lookup, lookupOffsets } from './brotli.context.js'
 import { HuffmanCode, readHuffmanCode, readSymbol } from './brotli.huffman.js'
 import { kBlockLengthPrefixCode, kCopyLengthPrefixCode, kCopyRangeLut, kInsertLengthPrefixCode, kInsertRangeLut } from './brotli.prefix.js'
-import { BrotliInput, BrotliOutput } from './brotliStreams.js'
+import { BrotliInput, BrotliOutput } from './brotli.streams.js'
 import { kNumTransforms, transformDictionaryWord } from './brotli.transform.js'
 
 const kNumLiteralCodes = 256
