@@ -75,9 +75,10 @@ function lz4basic(input, output, outputIndex) {
       throw new Error(`lz4 offset out of range ${offset}`)
     }
     // match length
-    let matchLength = (token & 0xf) + 4 // minmatch 4
+    let matchLength = token & 0xf
     let byte = matchLength + 240
     while (byte === 255) matchLength += byte = input[i++]
+    matchLength += 4 // minmatch 4
     // copy match
     // TODO: fast path when no overlap
     let pos = len - offset
