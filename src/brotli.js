@@ -64,14 +64,10 @@ export function decompressBrotli(input, outputLength) {
 function brotli(input, output) {
   let pos = 0
   let input_end = 0
-  let window_bits = 0
   let max_distance = 0
   // This ring buffer holds a few past copy distances that will be used by special distance codes
   const dist_rb = [ 16, 15, 11, 4 ]
   let dist_rb_idx = 0
-  /* The previous 2 bytes used for context */
-  let prev_byte1 = 0
-  let prev_byte2 = 0
   const hgroup = [new HuffmanTreeGroup(0, 0), new HuffmanTreeGroup(0, 0), new HuffmanTreeGroup(0, 0)]
 
   // We need the slack region for the following reasons:
@@ -83,7 +79,7 @@ function brotli(input, output) {
   const br = new BrotliBitReader(input)
 
   // Decode window size
-  window_bits = decodeWindowBits(br)
+  const window_bits = decodeWindowBits(br)
   const max_backward_distance = (1 << window_bits) - 16
 
   const ringbuffer_size = 1 << window_bits
@@ -99,13 +95,11 @@ function brotli(input, output) {
   }
 
   while (!input_end) {
-    let meta_block_remaining_len = 0
     const block_length = [ 1 << 28, 1 << 28, 1 << 28 ]
     const block_type = [ 0 ]
     const num_block_types = [ 1, 1, 1 ]
     const block_type_rb = [ 0, 1, 0, 1, 0, 1 ]
     const block_type_rb_index = [ 0 ]
-    let context_offset = 0
 
     for (let i = 0; i < 3; i++) {
       hgroup[i].codes = []
@@ -115,7 +109,7 @@ function brotli(input, output) {
     br.readMoreInput()
 
     const _out = decodeMetaBlockLength(br)
-    meta_block_remaining_len = _out.meta_block_length
+    let meta_block_remaining_len = _out.meta_block_length
     if (pos + meta_block_remaining_len > output.buffer.length) {
       // We need to grow the output buffer to fit the additional data
       const tmp = new Uint8Array( pos + meta_block_remaining_len )
@@ -213,8 +207,8 @@ function brotli(input, output) {
       const copyIndex = kCopyRangeLut[range_idx] + (cmd_code & 7)
       const copyCode = kCopyLengthPrefixCode[copyIndex]
       const copyLength = copyCode.offset + br.readBits(copyCode.nbits)
-      prev_byte1 = ringbuffer[pos - 1 & ringbuffer_mask]
-      prev_byte2 = ringbuffer[pos - 2 & ringbuffer_mask]
+      let prev_byte1 = ringbuffer[pos - 1 & ringbuffer_mask]
+      let prev_byte2 = ringbuffer[pos - 2 & ringbuffer_mask]
       for (let j = 0; j < insertLength; j++) {
         br.readMoreInput()
 
@@ -223,7 +217,7 @@ function brotli(input, output) {
             block_type_trees, 0, block_type, block_type_rb,
             block_type_rb_index, br)
           block_length[0] = readBlockLength(block_len_trees, 0, br)
-          context_offset = block_type[0] << kLiteralContextBits
+          const context_offset = block_type[0] << kLiteralContextBits
           context_map_slice = context_offset
           context_mode = context_modes[block_type[0]]
           context_lookup_offset1 = lookupOffsets[context_mode]
@@ -326,12 +320,6 @@ function brotli(input, output) {
           meta_block_remaining_len--
         }
       }
-
-      // When we get here, we must have inserted at least one literal and
-      // made a copy of at least length two, therefore accessing the last 2
-      // bytes is valid
-      prev_byte1 = ringbuffer[pos - 1 & ringbuffer_mask]
-      prev_byte2 = ringbuffer[pos - 2 & ringbuffer_mask]
     }
 
     // Protect pos from overflow, wrap it around at every GB of input data

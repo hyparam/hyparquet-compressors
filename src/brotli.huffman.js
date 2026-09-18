@@ -14,13 +14,15 @@ const kMaxHuffmanTableSize = new Uint16Array([
   854, 886, 920, 952, 984, 1016, 1048, 1080,
 ])
 
-/**
- * @param {number} bits
- * @param {number} value
- */
-export function HuffmanCode(bits, value) {
-  this.bits = bits // number of bits used for this symbol
-  this.value = value // symbol value or table offset
+export class HuffmanCode {
+  /**
+   * @param {number} bits
+   * @param {number} value
+   */
+  constructor(bits, value) {
+    this.bits = bits // number of bits used for this symbol
+    this.value = value // symbol value or table offset
+  }
 }
 
 const kCodeLengthRepeatCode = 16
@@ -354,26 +356,28 @@ function readHuffmanCodeLengths(code_length_code_lengths, num_symbols, code_leng
 }
 
 
-/**
- * Contains a collection of huffman trees with the same alphabet size.
- *
- * @param {number} alphabet_size
- * @param {number} num_htrees
- */
-export function HuffmanTreeGroup(alphabet_size, num_htrees) {
-  this.alphabet_size = alphabet_size
-  this.num_htrees = num_htrees
-  this.codes = new Array(num_htrees + num_htrees * kMaxHuffmanTableSize[alphabet_size + 31 >>> 5])
-  this.htrees = new Uint32Array(num_htrees)
-}
+export class HuffmanTreeGroup {
+  /**
+   * Contains a collection of huffman trees with the same alphabet size.
+   *
+   * @param {number} alphabet_size
+   * @param {number} num_htrees
+   */
+  constructor(alphabet_size, num_htrees) {
+    this.alphabet_size = alphabet_size
+    this.num_htrees = num_htrees
+    this.codes = new Array(num_htrees + num_htrees * kMaxHuffmanTableSize[alphabet_size + 31 >>> 5])
+    this.htrees = new Uint32Array(num_htrees)
+  }
 
-/**
- * @param {BrotliBitReader} br
- */
-HuffmanTreeGroup.prototype.decode = function(br) {
-  let next = 0
-  for (let i = 0; i < this.num_htrees; i++) {
-    this.htrees[i] = next
-    next += readHuffmanCode(this.alphabet_size, this.codes, next, br)
+  /**
+   * @param {BrotliBitReader} br
+   */
+  decode(br) {
+    let next = 0
+    for (let i = 0; i < this.num_htrees; i++) {
+      this.htrees[i] = next
+      next += readHuffmanCode(this.alphabet_size, this.codes, next, br)
+    }
   }
 }

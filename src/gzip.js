@@ -166,8 +166,7 @@ export function gunzip(input, output, inputIndex = 0, outputIndex = 0) {
     ensureSize(outputIndex + 131072) // max chunk size?
     const lms = (1 << lengthBits) - 1
     const dms = (1 << distBits) - 1
-    let lpos = pos
-    for (;; lpos = pos) {
+    for (;;) {
       // bits read, code
       const code = lengthMap[bits16(input, pos) & lms]
       const sym = code >> 4
@@ -176,7 +175,6 @@ export function gunzip(input, output, inputIndex = 0, outputIndex = 0) {
       if (!code) throw new Error('invalid length/literal')
       if (sym < 256) out[outputIndex++] = sym
       else if (sym === 256) {
-        lpos = pos
         lengthMap = undefined
         break
       } else {
@@ -207,7 +205,6 @@ export function gunzip(input, output, inputIndex = 0, outputIndex = 0) {
         for (; outputIndex < end; outputIndex++) out[outputIndex] = out[outputIndex - dt]
       }
     }
-    pos = lpos
     if (lengthMap) final = 1
   } while (!final)
 

@@ -24,111 +24,117 @@ const kBitMask = new Uint32Array([
   65535, 131071, 262143, 524287, 1048575, 2097151, 4194303, 8388607, 16777215,
 ])
 
-/**
- * Input byte buffer, consist of a ringbuffer and a "slack" region where
- * bytes from the start of the ringbuffer are copied.
- *
- * @typedef {import('./brotli.streams.js').BrotliInput} BrotliInput
- * @param {BrotliInput} input
- */
-export function BrotliBitReader(input) {
-  this.buf_ = new Uint8Array(BROTLI_IBUF_SIZE)
-  this.input_ = input /* input callback */
+export class BrotliBitReader {
+  /**
+   * Input byte buffer, consist of a ringbuffer and a "slack" region where
+   * bytes from the start of the ringbuffer are copied.
+   *
+   * @typedef {import('./brotli.streams.js').BrotliInput} BrotliInput
+   * @param {BrotliInput} input
+   */
+  constructor(input) {
+    this.buf_ = new Uint8Array(BROTLI_IBUF_SIZE)
+    this.input_ = input /* input callback */
 
-  this.buf_ptr_ = 0 /* next input will write here */
-  this.val_ = 0 /* pre-fetched bits */
-  this.pos_ = 0 /* byte position in stream */
+    this.buf_ptr_ = 0 /* next input will write here */
+    this.val_ = 0 /* pre-fetched bits */
+    this.pos_ = 0 /* byte position in stream */
 
-  this.reset()
-}
+    this.bit_pos_ = 0
+    this.bit_end_pos_ = 0
+    this.eos_ = 0
 
-BrotliBitReader.READ_SIZE = BROTLI_READ_SIZE
-BrotliBitReader.IBUF_MASK = BROTLI_IBUF_MASK
-
-BrotliBitReader.prototype.reset = function() {
-  this.buf_ptr_ = 0 /* next input will write here */
-  this.val_ = 0 /* pre-fetched bits */
-  this.pos_ = 0 /* byte position in stream */
-  this.bit_pos_ = 0 /* current bit-reading position in val_ */
-  this.bit_end_pos_ = 0 /* bit-reading end position from LSB of val_ */
-  this.eos_ = 0 /* input stream is finished */
-
-  this.readMoreInput()
-  for (let i = 0; i < 4; i++) {
-    this.val_ |= this.buf_[this.pos_] << 8 * i
-    this.pos_++
+    this.reset()
   }
 
-  return this.bit_end_pos_ > 0
-}
+  static READ_SIZE = BROTLI_READ_SIZE
+  static IBUF_MASK = BROTLI_IBUF_MASK
 
-/**
- * Fills up the input ringbuffer by calling the input callback.
- *
- * Does nothing if there are at least 32 bytes present after current position.
- *
- * Returns 0 if either:
- *  - the input callback returned an error, or
- *  - there is no more input and the position is past the end of the stream.
- *
- * After encountering the end of the input stream, 32 additional zero bytes are
- * copied to the ringbuffer, therefore it is safe to call this function after
- * every 32 bytes of input is read.
- */
-BrotliBitReader.prototype.readMoreInput = function() {
-  if (this.bit_end_pos_ > 256) {
-    // return
-  } else if (this.eos_) {
-    if (this.bit_pos_ > this.bit_end_pos_)
-      throw new Error('Unexpected end of input ' + this.bit_pos_ + ' ' + this.bit_end_pos_)
-  } else {
-    const dst = this.buf_ptr_
-    const bytes_read = this.input_.read(this.buf_, dst, BROTLI_READ_SIZE)
-    if (bytes_read < 0) {
-      throw new Error('Unexpected end of input')
+  reset() {
+    this.buf_ptr_ = 0 /* next input will write here */
+    this.val_ = 0 /* pre-fetched bits */
+    this.pos_ = 0 /* byte position in stream */
+    this.bit_pos_ = 0 /* current bit-reading position in val_ */
+    this.bit_end_pos_ = 0 /* bit-reading end position from LSB of val_ */
+    this.eos_ = 0 /* input stream is finished */
+
+    this.readMoreInput()
+    for (let i = 0; i < 4; i++) {
+      this.val_ |= this.buf_[this.pos_] << 8 * i
+      this.pos_++
     }
 
-    if (bytes_read < BROTLI_READ_SIZE) {
-      this.eos_ = 1
-      /* Store 32 bytes of zero after the stream end. */
-      for (let p = 0; p < 32; p++)
-        this.buf_[dst + bytes_read + p] = 0
-    }
+    return this.bit_end_pos_ > 0
+  }
 
-    if (dst === 0) {
-      /* Copy the head of the ringbuffer to the slack region. */
-      for (let p = 0; p < 32; p++)
-        this.buf_[(BROTLI_READ_SIZE << 1) + p] = this.buf_[p]
-
-      this.buf_ptr_ = BROTLI_READ_SIZE
+  /**
+   * Fills up the input ringbuffer by calling the input callback.
+   *
+   * Does nothing if there are at least 32 bytes present after current position.
+   *
+   * Returns 0 if either:
+   *  - the input callback returned an error, or
+   *  - there is no more input and the position is past the end of the stream.
+   *
+   * After encountering the end of the input stream, 32 additional zero bytes are
+   * copied to the ringbuffer, therefore it is safe to call this function after
+   * every 32 bytes of input is read.
+   */
+  readMoreInput() {
+    if (this.bit_end_pos_ > 256) {
+      // return
+    } else if (this.eos_) {
+      if (this.bit_pos_ > this.bit_end_pos_)
+        throw new Error('Unexpected end of input ' + this.bit_pos_ + ' ' + this.bit_end_pos_)
     } else {
-      this.buf_ptr_ = 0
+      const dst = this.buf_ptr_
+      const bytes_read = this.input_.read(this.buf_, dst, BROTLI_READ_SIZE)
+      if (bytes_read < 0) {
+        throw new Error('Unexpected end of input')
+      }
+
+      if (bytes_read < BROTLI_READ_SIZE) {
+        this.eos_ = 1
+        /* Store 32 bytes of zero after the stream end. */
+        for (let p = 0; p < 32; p++)
+          this.buf_[dst + bytes_read + p] = 0
+      }
+
+      if (dst === 0) {
+        /* Copy the head of the ringbuffer to the slack region. */
+        for (let p = 0; p < 32; p++)
+          this.buf_[(BROTLI_READ_SIZE << 1) + p] = this.buf_[p]
+
+        this.buf_ptr_ = BROTLI_READ_SIZE
+      } else {
+        this.buf_ptr_ = 0
+      }
+
+      this.bit_end_pos_ += bytes_read << 3
     }
-
-    this.bit_end_pos_ += bytes_read << 3
   }
-}
 
-/* Guarantees that there are at least 24 bits in the buffer. */
-BrotliBitReader.prototype.fillBitWindow = function() {
-  while (this.bit_pos_ >= 8) {
-    this.val_ >>>= 8
-    this.val_ |= this.buf_[this.pos_ & BROTLI_IBUF_MASK] << 24
-    this.pos_++
-    this.bit_pos_ = this.bit_pos_ - 8 >>> 0
-    this.bit_end_pos_ = this.bit_end_pos_ - 8 >>> 0
+  /* Guarantees that there are at least 24 bits in the buffer. */
+  fillBitWindow() {
+    while (this.bit_pos_ >= 8) {
+      this.val_ >>>= 8
+      this.val_ |= this.buf_[this.pos_ & BROTLI_IBUF_MASK] << 24
+      this.pos_++
+      this.bit_pos_ = this.bit_pos_ - 8 >>> 0
+      this.bit_end_pos_ = this.bit_end_pos_ - 8 >>> 0
+    }
   }
-}
 
-/**
- * Reads the specified number of bits from Read Buffer.
- *
- * @param {number} n_bits
- * @returns {number}
- */
-BrotliBitReader.prototype.readBits = function(n_bits) {
-  if (32 - this.bit_pos_ < n_bits) this.fillBitWindow()
-  const val = this.val_ >>> this.bit_pos_ & kBitMask[n_bits]
-  this.bit_pos_ += n_bits
-  return val
+  /**
+   * Reads the specified number of bits from Read Buffer.
+   *
+   * @param {number} n_bits
+   * @returns {number}
+   */
+  readBits(n_bits) {
+    if (32 - this.bit_pos_ < n_bits) this.fillBitWindow()
+    const val = this.val_ >>> this.bit_pos_ & kBitMask[n_bits]
+    this.bit_pos_ += n_bits
+    return val
+  }
 }

@@ -39,18 +39,20 @@ const kOmitFirst7 = 18
 // const kOmitFirst8 = 19
 const kOmitFirst9 = 20
 
-/**
- * @param {string} prefix
- * @param {number} transform
- * @param {string} suffix
- */
-function Transform(prefix, transform, suffix) {
-  this.prefix = new Uint8Array(prefix.length)
-  this.transform = transform
-  this.suffix = new Uint8Array(suffix.length)
+class Transform {
+  /**
+   * @param {string} prefix
+   * @param {number} transform
+   * @param {string} suffix
+   */
+  constructor(prefix, transform, suffix) {
+    this.prefix = new Uint8Array(prefix.length)
+    this.transform = transform
+    this.suffix = new Uint8Array(suffix.length)
 
-  for (let i = 0; i < prefix.length; i++) this.prefix[i] = prefix.charCodeAt(i)
-  for (let i = 0; i < suffix.length; i++) this.suffix[i] = suffix.charCodeAt(i)
+    for (let i = 0; i < prefix.length; i++) this.prefix[i] = prefix.charCodeAt(i)
+    for (let i = 0; i < suffix.length; i++) this.suffix[i] = suffix.charCodeAt(i)
+  }
 }
 
 export const kTransforms = [
