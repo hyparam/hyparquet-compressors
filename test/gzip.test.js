@@ -38,6 +38,14 @@ describe('gzip compressor', () => {
     expect(output).toEqual(new Uint8Array(new Array(10000).fill(42)))
   })
 
+  it('read gzip block with extra field', () => {
+    const input = new Uint8Array([
+      31, 139, 8, 4, 0, 0, 0, 0, 0, 255, 6, 0, 65, 66, 2, 0, 1, 2, // header with FEXTRA
+      227, 230, 22, 83, 4, 0, 117, 18, 225, 170, 4, 0, 0, 0,
+    ])
+    expect(gunzip(input)).toEqual(new Uint8Array([11, 11, 22, 33]))
+  })
+
   it('throw error on invalid gzip data', () => {
     const input = new Uint8Array([31, 139, 8, 4, 0, 0, 0, 0, 0, 255, 255, 0, 0, 0, 0, 0, 0])
     const output = new Uint8Array(4)
